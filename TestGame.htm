@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://192.168.0.32:1616/socket.io/socket.io.js"></script>
+
+    <script type="text/javascript">
+        var iosocket = null;
+        try {
+            iosocket = io.connect("http://192.168.0.32:1616/");
+        }
+        catch (ex) {            
+            console.log("Error connecting to Server: ", ex);            
+        }
+        iosocket.on('connect', function () {
+            iosocket.on('message', function (message) {
+			//console.log(JSON.stringify(message));
+			//console.log("message.Type" + message.Type);
+                var timer;
+                switch (message.Type) {
+                    case 1:
+					var  userCount = parseInt($("#ConnectedUserCount").html());
+					$('#ConnectedUserCount').html(userCount+1);									
+                        break;
+					case 2:					 
+					$('#id'+message.msg).css("background-color","green");
+					$('#id'+message.msg).attr("disabled", true);					 					
+                    break;
+					case 3:					 					
+					$('#id'+message.msg).css("background-color","red");			 
+					$('#id'+message.msg).attr("disabled", true);
+					
+					break;
+                }
+            });
+			 
+			var msgToSend = "{'Type':" + 1 + "}";			
+			iosocket.send(msgToSend);				
+			$("input[type='submit']").bind('click', function () {
+				$('#Position').val($('#idtxt1').val()) ;
+				console.log("$('#Position').val()"+$('#Position').val());
+				if ($('#Position').val() != '' )
+				{
+					try
+					{
+						if ( parseInt($('#Position').val()) <=20  &&  parseInt($('#Position').val()) > 0 )
+						{				
+							var msgToSend = "{'Type':" + 3 + " ,'value':" +$('#idtxt1').val()+ "}";
+							iosocket.send(msgToSend);	
+							$(this).attr("disabled", true);
+							$('#id'+$('#idtxt1').val()).attr("disabled", true);
+							$('#id'+$('#idtxt1').val()).css("background-color","yellow");
+						}
+						else
+						{
+							alert("please enter a number between 1 to 20");
+						}
+					}
+					catch(ex)
+					{
+						alert("please enter integer value");
+					}				
+				}
+				else
+				{
+					alert("please enter a number value in textbox");
+				}
+			}); 
+			$("input[type='button']").bind('click', function () 
+			{
+				if ($('#Position').val() != '0')
+				{			
+					if($(this).val() != $('#Position').val()){
+						var msgToSend = "{'Type':" + 2 + " ,'value':" +$(this).val()	 + "}";
+						iosocket.send(msgToSend);
+						}
+						else
+						{ 
+							alert("you can not click this number");							
+						}
+					}
+				else
+				{
+					alert("Firstl you have to enter a number between 1 to 20");
+				}
+		    });           
+        });
+	
+    </script>
+    	
+     
+</head>
+<body>
+<br><br><br>
+<span style = "font-family:sans-serif; ">
+Step 1: First enter any integer between 1 and 20 in the text box to indicate to other clients that this is your number.<br/>
+See how this number turns yellow for you but same turns red for all other users.<br/>
+Similalry you will see other users button turn green on your screen<br/>
+<br><br>
+Step 2: Once all users are connected, you can click on any remaining buttons and see them turn green on yours and all other users' screens.<br/>
+This simply shows how Node.js server uses SocketIO to connect and send messages instantly between clients.<br/>
+<br><br>
+</p> </div>
+<p id="ConnectedUserCount" style="display:none">0</p>
+<div style="float:left;width :1000px">
+<div  id ="btnGroupID" style="float:left; margin-left:400px; width :700px" align="centre" >
+
+<input type="hidden" id="Position" value="0" />
+<input  id="idtxt1" type="text"/>
+<input  title="idbtn1" type="submit" value="Enter" />
+<div><br/>
+<div  id ="btnGroupID" style="float:left; width :600px" >
+<div style="float:left; width:100%">
+<input  id="id1" type="button" value="1" />
+<input  id="id2" type="button" value="2" />
+<input  id="id3" type="button" value="3" />
+<input  id="id4" type="button" value="4" />
+<input  id="id5" type="button" value="5" />
+<input  id="id6" type="button" value="6" />
+<input  id="id7" type="button" value="7" />
+<input  id="id8" type="button" value="8" />
+<input  id="id9" type="button" value="9" />
+<input  id="id10" type="button" value="10" />
+</div>
+<div style="float:left">
+<input  id="id11" type="button" value="11" />
+<input  id="id12" type="button" value="12" />
+<input  id="id13" type="button" value="13" />
+<input  id="id14" type="button" value="14" />
+<input  id="id15" type="button" value="15" />
+<input  id="id16" type="button" value="16" />
+<input  id="id17" type="button" value="17" />
+<input  id="id18" type="button" value="18" />
+<input  id="id19" type="button" value="19" />
+<input  id="id20" type="button" value="20" />
+</div>
+</div>
+</div>
+</body>
+</html>
